@@ -1,7 +1,6 @@
 
 // Sequence section
 byte r = 4;
-String sequence = "";
 int* genSeq = 0;
 byte cutSeq = ' ';
 
@@ -18,6 +17,9 @@ const byte twistLed = 5;
 const int maxThreshold = 900;
 const int minThreshold = 90;
 bool twistSuccess = false;
+
+const int ledHealthPins[] = {6, 7, 8};
+static int ledIndex = 0;
 
 const unsigned long interval = 2000;
 
@@ -59,6 +61,7 @@ void loop() {
       if (cover_it(coverLed, photoPin, interval) == true) {
         Serial.println("Cover it succeeded.");
       } else {
+        health(false);
         Serial.println("Cover it failed");
 
       }
@@ -68,6 +71,7 @@ void loop() {
       if (bopIt() == true) {
         Serial.println("Bop it succeeded.");
       } else {
+        health(false);
         Serial.println("Bop it failed");
       }
       break;
@@ -76,6 +80,7 @@ void loop() {
       if (twistIt() == true) {
         Serial.println("Twist it succeeded.");
       } else {
+        health(false);
         Serial.println("Twist it failed");
       }
       break;
@@ -183,3 +188,30 @@ bool twistIt()
   digitalWrite(twistLed, LOW);
   return false;
 }
+
+void health(bool health)
+  {
+    
+  if (health == false) 
+  {
+    for (int i = 0; i < 10; i++)
+    {
+   digitalWrite(ledHealthPins[ledIndex], HIGH);
+      delay(100);
+   digitalWrite(ledHealthPins[ledIndex], LOW);
+      delay(100);
+    }
+  }
+    delay(1000);
+    ledIndex++;
+    if (ledIndex >= sizeof(ledHealthPins) / sizeof(ledHealthPins[0]))
+    {
+      for (int i = 0; i < sizeof(ledHealthPins) / sizeof(ledHealthPins[0]); i++)
+      {
+        digitalWrite(ledHealthPins[i],HIGH);
+      }
+      ledIndex = 0;
+    }
+  
+  }
+
