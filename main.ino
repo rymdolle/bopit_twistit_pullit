@@ -30,12 +30,12 @@ enum seqInstructions{
   pull
 };
 
-void setup() { 
+void setup() {
   pinMode(bopLed, OUTPUT);
   pinMode(bopBtn, INPUT);
-  
+
   pinMode(twistLed, OUTPUT);
-  
+
   pinMode(coverLed, OUTPUT);
 
   Serial.begin(9600);
@@ -44,53 +44,53 @@ void setup() {
 
 void loop() {
 
-genSeq = generateSequence();
-  
-for (int i = 0; i < r; i++) {
-  cutSeq = genSeq[i];
-  delay(1000);
-  
-  // Göra om en array och deklarera den vid varje loop
-  // med r som storlek av arrayn
+  genSeq = generateSequence();
 
-  switch(cutSeq) {
+  for (int i = 0; i < r; i++) {
+    cutSeq = genSeq[i];
+    delay(1000);
+
+    // Göra om en array och deklarera den vid varje loop
+    // med r som storlek av arrayn
+
+    switch(cutSeq) {
     case cover:
-    Serial.println("Cover it");
-    if (cover_it() == true) {
-      Serial.println("Cover it succeeded.");
-    } else if(cover_it() == false) {
-      Serial.println("Cover it failed");
-      
-    }
-    break;
+      Serial.println("Cover it");
+      if (cover_it(coverLed, photoPin, interval) == true) {
+        Serial.println("Cover it succeeded.");
+      } else {
+        Serial.println("Cover it failed");
+
+      }
+      break;
     case bop:
-    Serial.println("Bop it");
-    if (bopIt() == true) {
-      Serial.println("Bop it succeeded.");
-    } else if(bopIt() == false) {
-      Serial.println("Bop it failed");
-    }
-    break;
+      Serial.println("Bop it");
+      if (bopIt() == true) {
+        Serial.println("Bop it succeeded.");
+      } else {
+        Serial.println("Bop it failed");
+      }
+      break;
     case twist:
-    Serial.println("Twist it");
-    if (twistIt() == true) {
-      Serial.println("Twist it succeeded.");
-    } else if(twistIt() == false) {
-      Serial.println("Twist it failed");
-    }
-    break;
+      Serial.println("Twist it");
+      if (twistIt() == true) {
+        Serial.println("Twist it succeeded.");
+      } else {
+        Serial.println("Twist it failed");
+      }
+      break;
     case pull:
-    Serial.println("Pull it");
-    break;
+      Serial.println("Pull it");
+      break;
     default:
-    Serial.println("Something went wrong in the sequence instructions statement");
-    break;
+      Serial.println("Something went wrong in the sequence instructions statement");
+      break;
+    }
   }
-}
 
-Serial.println("Sequence complete");
+  Serial.println("Sequence complete");
 
-delay(1000);
+  delay(1000);
 
 }
 
@@ -99,7 +99,7 @@ int* generateSequence(){
     delete[] genSeq;
   }
   int* sequence = new int[r];
-  
+
   for (int i = 0; i < r; i++) {
     sequence[i] = random(4);
 
@@ -114,7 +114,7 @@ bool bopIt() {
   byte lRead = digitalRead(bopLed);
 
   digitalWrite(bopLed, HIGH);
-  
+
   while (millis() - start < interval) {
     if (digitalRead(bopBtn) == HIGH) {
       Serial.println("You have succeeded!");
@@ -126,31 +126,31 @@ bool bopIt() {
   return false;
 }
 
-bool cover_it()
+bool cover_it(uint8_t led_pin, uint8_t sensor_pin, int timeout)
 {
-  digitalWrite(coverLed, 1);
+  digitalWrite(led_pin, 1);
 
   int start = millis();
-  
-  while (millis() - start < interval) {
-    if (read_photosensor()) {
+
+  while (millis() - start < timeout) {
+    if (read_photosensor(sensor_pin)) {
       // Player succeeded to cover sensor
-      digitalWrite(coverLed, 0);
+      digitalWrite(sensor_pin, 0);
       return true;
     }
   }
 
   // timeout reached
-  digitalWrite(coverLed, 0);
+  digitalWrite(led_pin, 0);
   return false;
 }
 
-bool read_photosensor()
+bool read_photosensor(uint8_t sensor_pin)
 {
   static int psensor_min = 1 << 10;
   static int psensor_max = 0;
 
-  int value = analogRead(photoPin);
+  int value = analogRead(sensor_pin);
   psensor_max = max(value, psensor_max);
   psensor_min = min(value, psensor_min);
   int diff = psensor_max - psensor_min;
@@ -167,22 +167,19 @@ bool twistIt()
   int start = millis();
   while(millis() - start < interval) {
     int currentValue = analogRead(twistPin);
-  
+
     if (currentValue >= maxThreshold && !twistSuccess) {
     twistSuccess = true;
     }
     if (twistSuccess && currentValue <= minThreshold) {
       //Serial.println("Twist-It Success!"); // Just 4 testing
-  
+
       twistSuccess = false;
       digitalWrite(twistLed, LOW);
       return true;
   	}
-	
   }
+
   digitalWrite(twistLed, LOW);
   return false;
 }
-
-
-
