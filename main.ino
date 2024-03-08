@@ -2,7 +2,7 @@
 // Sequence section
 byte r = 4;
 String sequence = "";
-String genSeq = "";
+int* genSeq = 0;
 byte cutSeq = ' ';
 
 // Actions section
@@ -17,18 +17,17 @@ const byte twistPin = A2;
 const byte twistLed = 5;
 const int maxThreshold = 900;
 const int minThreshold = 90;
-//bool maxOrLow = false;
 bool twistSuccess = false;
 
 const unsigned long interval = 2000;
 
 
 enum seqInstructions{
-  coverItSeq,
-  bopItSeq,
-  twistItSeq,
+  cover,
+  bop,
+  twist,
   // Pull it eller pass it
-  pullItSeq
+  pull
 };
 
 void setup() { 
@@ -47,15 +46,15 @@ void loop() {
 
 genSeq = generateSequence();
   
-for (int i = 0; i < genSeq.length(); i++) {
-  cutSeq = genSeq[i]-48;
+for (int i = 0; i < r; i++) {
+  cutSeq = genSeq[i];
   delay(1000);
   
   // Göra om en array och deklarera den vid varje loop
   // med r som storlek av arrayn
 
   switch(cutSeq) {
-    case coverItSeq:
+    case cover:
     Serial.println("Cover it");
     if (cover_it() == true) {
       Serial.println("Cover it succeeded.");
@@ -64,7 +63,7 @@ for (int i = 0; i < genSeq.length(); i++) {
       
     }
     break;
-    case bopItSeq:
+    case bop:
     Serial.println("Bop it");
     if (bopIt() == true) {
       Serial.println("Bop it succeeded.");
@@ -72,7 +71,7 @@ for (int i = 0; i < genSeq.length(); i++) {
       Serial.println("Bop it failed");
     }
     break;
-    case twistItSeq:
+    case twist:
     Serial.println("Twist it");
     if (twistIt() == true) {
       Serial.println("Twist it succeeded.");
@@ -80,7 +79,7 @@ for (int i = 0; i < genSeq.length(); i++) {
       Serial.println("Twist it failed");
     }
     break;
-    case pullItSeq:
+    case pull:
     Serial.println("Pull it");
     break;
     default:
@@ -95,12 +94,14 @@ delay(1000);
 
 }
 
-String generateSequence(){
-  sequence = "";
+int* generateSequence(){
+  if(genSeq != nullptr){
+    delete[] genSeq;
+  }
+  int* sequence = new int[r];
   
   for (int i = 0; i < r; i++) {
-    byte rand = random(4);
-    sequence += rand;
+    sequence[i] = random(4);
 
   }
 
@@ -182,5 +183,6 @@ bool twistIt()
   digitalWrite(twistLed, LOW);
   return false;
 }
+
 
 
