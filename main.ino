@@ -1,8 +1,6 @@
-
 // Sequence section
 byte r = 4;
-int* genSeq = 0;
-byte cutSeq = ' ';
+
 
 // Actions section
 
@@ -11,6 +9,7 @@ byte bopBtn = 3;
 
 byte coverLed = 4;
 byte photoPin = A1;
+byte buzzer = 10;
 
 const byte twistPin = A2;
 const byte twistLed = 5;
@@ -32,86 +31,70 @@ enum seqInstructions{
   pull
 };
 
-void setup() {
+void setup() { 
   pinMode(bopLed, OUTPUT);
   pinMode(bopBtn, INPUT);
-
+  
   pinMode(twistLed, OUTPUT);
-
+  
   pinMode(coverLed, OUTPUT);
+  
+   for (int i = 0; i < sizeof(ledHealthPins) / sizeof(ledHealthPins[0]); i++)
+ {
+    pinMode(ledHealthPins[i], OUTPUT);
+    digitalWrite(ledHealthPins[i], HIGH);
+ }
 
   Serial.begin(9600);
   randomSeed(analogRead(0));
 }
 
 void loop() {
+  
+  if (digitalRead(ledHealthPins[2]) == LOW) {
+    // Check if last health pin is off, then its game over
+    blink_health(6, 100);
+    delay(2000);
+  }
 
-  genSeq = generateSequence();
+  
 
-  for (int i = 0; i < r; i++) {
-    cutSeq = genSeq[i];
-    delay(1000);
-
-    // Göra om en array och deklarera den vid varje loop
-    // med r som storlek av arrayn
-
-    switch(cutSeq) {
+  switch(random(3)) {
     case cover:
-      Serial.println("Cover it");
-      if (cover_it(coverLed, photoPin, interval) == true) {
-        Serial.println("Cover it succeeded.");
-      } else {
-        health(false);
-        Serial.println("Cover it failed");
-
-      }
-      break;
-    case bop:
-      Serial.println("Bop it");
-      if (bopIt() == true) {
-        Serial.println("Bop it succeeded.");
-      } else {
-        health(false);
-        Serial.println("Bop it failed");
-      }
-      break;
-    case twist:
-      Serial.println("Twist it");
-      if (twistIt() == true) {
-        Serial.println("Twist it succeeded.");
-      } else {
-        health(false);
-        Serial.println("Twist it failed");
-      }
-      break;
-    case pull:
-      Serial.println("Pull it");
-      break;
-    default:
-      Serial.println("Something went wrong in the sequence instructions statement");
-      break;
+    Serial.println("Cover it");
+    if (cover_it() == true) {
+      Serial.println("Cover it succeeded.");
+    } else {
+      failure();
+      Serial.println("Cover it failed");
+      
     }
+    break;
+    case bop:
+    Serial.println("Bop it");
+    if (bopIt() == true) {
+      Serial.println("Bop it succeeded.");
+    } else {
+      failure();
+      Serial.println("Bop it failed");
+    }
+    break;
+    case twist:
+    Serial.println("Twist it");
+    if (twistIt() == true) {
+      Serial.println("Twist it succeeded.");
+    } else {
+      failure();
+      Serial.println("Twist it failed");
+    }
+    break;
+    case pull:
+    Serial.println("Pull it");
+    break;
+    default:
+    Serial.println("Something went wrong in the sequence instructions statement");
+    break;
   }
-
-  Serial.println("Sequence complete");
-
-  delay(1000);
-
-}
-
-int* generateSequence(){
-  if(genSeq != nullptr){
-    delete[] genSeq;
-  }
-  int* sequence = new int[r];
-
-  for (int i = 0; i < r; i++) {
-    sequence[i] = random(4);
-
-  }
-
-  r++;
-  return sequence;
 }
 
 bool bopIt() {
@@ -119,7 +102,7 @@ bool bopIt() {
   byte lRead = digitalRead(bopLed);
 
   digitalWrite(bopLed, HIGH);
-
+  
   while (millis() - start < interval) {
     if (digitalRead(bopBtn) == HIGH) {
       Serial.println("You have succeeded!");
@@ -131,31 +114,31 @@ bool bopIt() {
   return false;
 }
 
-bool cover_it(uint8_t led_pin, uint8_t sensor_pin, int timeout)
+bool cover_it()
 {
-  digitalWrite(led_pin, 1);
+  digitalWrite(coverLed, 1);
 
   int start = millis();
-
-  while (millis() - start < timeout) {
-    if (read_photosensor(sensor_pin)) {
+  
+  while (millis() - start < interval) {
+    if (read_photosensor()) {
       // Player succeeded to cover sensor
-      digitalWrite(sensor_pin, 0);
+      digitalWrite(coverLed, 0);
       return true;
     }
   }
 
   // timeout reached
-  digitalWrite(led_pin, 0);
+  digitalWrite(coverLed, 0);
   return false;
 }
 
-bool read_photosensor(uint8_t sensor_pin)
+bool read_photosensor()
 {
   static int psensor_min = 1 << 10;
   static int psensor_max = 0;
 
-  int value = analogRead(sensor_pin);
+  int value = analogRead(photoPin);
   psensor_max = max(value, psensor_max);
   psensor_min = min(value, psensor_min);
   int diff = psensor_max - psensor_min;
@@ -189,19 +172,20 @@ bool twistIt()
   return false;
 }
 
-void health(bool health)
+void failure()
   {
     
-  if (health == false) 
-  {
-    for (int i = 0; i < 10; i++)
+	tone(buzzer,350);
+  	delay(200);
+  	tone(buzzer,200, 500);  
+  
+    for (int i = 0; i < 6; i++)
     {
-   digitalWrite(ledHealthPins[ledIndex], HIGH);
-      delay(100);
-   digitalWrite(ledHealthPins[ledIndex], LOW);
-      delay(100);
+      digitalWrite(ledHealthPins[ledIndex], HIGH);
+      delay(250);
+      digitalWrite(ledHealthPins[ledIndex], LOW);
+      delay(250);
     }
-  }
     delay(1000);
     ledIndex++;
     if (ledIndex >= sizeof(ledHealthPins) / sizeof(ledHealthPins[0]))
@@ -211,7 +195,5 @@ void health(bool health)
         digitalWrite(ledHealthPins[i],HIGH);
       }
       ledIndex = 0;
-    }
-  
   }
-
+}
