@@ -10,7 +10,7 @@ bool cover_it(uint8_t coverLed, uint8_t photoPin, long timeout)
   long start = millis();
   while (millis() - start < timeout) {
     play_melody(timeout, false);
-    if (read_photosensor()) {
+    if (read_photosensor(photoPin)) {
       // Player succeeded to cover sensor
       digitalWrite(coverLed, 0);
       return true;
@@ -22,7 +22,7 @@ bool cover_it(uint8_t coverLed, uint8_t photoPin, long timeout)
   return false;
 }
 
-static bool read_photosensor()
+static bool read_photosensor(uint8_t photoPin)
 {
   const int count = 10;
   int readings[count];
@@ -41,18 +41,22 @@ static bool read_photosensor()
   avg = total / count;
 
   int value = avg; // analogRead(photoPin);
+  /*
   Serial.print("PhotoValue: ");
   Serial.print(value);
   Serial.print(" (");
   Serial.print(avg);
   Serial.print(") ");
+  */
   psensor_max = max(value, psensor_max);
   psensor_min = min(value, psensor_min);
   int diff = psensor_max - psensor_min;
+  /*
   Serial.print(psensor_max);
   Serial.print(" ");
   Serial.print(psensor_min);
   Serial.print(" ");
+  */
 
   // Threshold is half the diff of max and min
   int threshold = diff / 2;

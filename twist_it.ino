@@ -7,7 +7,7 @@ bool twist_it(uint8_t coverLed, uint8_t photoPin, long timeout)
   while(millis() - start < timeout) {
     play_melody(timeout, false);
     int currentValue = analogRead(twistPin);
-    Serial.println(currentValue);
+    // Serial.println(currentValue);
 
     if (currentValue >= maxThreshold && !twistSuccess) {
       twistSuccess = true;
