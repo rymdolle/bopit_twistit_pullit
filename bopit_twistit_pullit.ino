@@ -54,6 +54,7 @@ void setup() {
   Serial.begin(9600);
   randomSeed(analogRead(0));
   start();
+  multiplayer_init();
 }
 
 void loop() {
