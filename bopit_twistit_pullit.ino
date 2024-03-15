@@ -21,6 +21,8 @@ static int ledIndex = 0;
 const int ledCount = sizeof(ledHealthPins) / sizeof(ledHealthPins[0]);
 
 unsigned long interval = 4000;
+bool gameOver = false;
+bool success = false;
 
 
 enum seqInstructions{
@@ -51,23 +53,23 @@ void setup() {
 
   Serial.begin(9600);
   randomSeed(analogRead(0));
-  startBopIt();
+  start();
 }
 
 void loop() {
   if (digitalRead(ledHealthPins[2]) == LOW) {
     // Check if last health pin is off, then its game over
     //blink_health(6, 100);
+    gameOver = true;
     delay(2000);
   }
 
-  if (play_melody(interval, false))
-    interval = max(1000, interval - 40);
   switch(random(3)) {
   case cover:
     Serial.println("Cover it");
     if (cover_it(coverLed, photoPin, interval) == true) {
       Serial.println("Cover it succeeded.");
+      success = true;
     } else {
       failure();
       Serial.println("Cover it failed");
@@ -77,6 +79,7 @@ void loop() {
     Serial.println("Bop it");
     if (bop_it(bopLed, bopBtn, interval) == true) {
       Serial.println("Bop it succeeded.");
+      success = true;
     } else {
       failure();
       Serial.println("Bop it failed");
@@ -86,6 +89,7 @@ void loop() {
     Serial.println("Twist it");
     if (twist_it(twistLed, twistPin, interval) == true) {
       Serial.println("Twist it succeeded.");
+      success = true;
     } else {
       failure();
       Serial.println("Twist it failed");
@@ -98,6 +102,7 @@ void loop() {
     Serial.println("Something went wrong in the sequence instructions statement");
     break;
   }
+  lower_interval(success);
 }
 
 void failure()
@@ -119,11 +124,10 @@ void failure()
     }
     ledIndex = 0;
   }
-  interval += 40;
   play_melody(interval, true);
 }
 
-void startBopIt()
+void start()
 {
   int blinkCount = 4;
   int delayTime = 200;
@@ -151,4 +155,20 @@ void startBopIt()
   for (int k = 0; k < ledCount; k++) {
     digitalWrite(ledHealthPins[k], HIGH);
   };
+}
+
+void lower_interval(bool success) {
+  if (interval > 1000 && success) {
+    interval -= 100;
+    
+    Serial.print("Interval is: ");
+    Serial.println(interval);
+  } else {
+    Serial.print("Action failed or interval reached min: ");
+    Serial.println(interval);
+  }
+
+  if (gameOver) {
+    interval = 4000;
+  }
 }
