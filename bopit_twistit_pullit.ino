@@ -61,6 +61,7 @@ void setup() {
   randomSeed(analogRead(0));
   setRGB(0,0,255);
   start();
+  multiplayer_init();
 }
 
 void loop() {
