@@ -41,22 +41,11 @@ static bool read_photosensor(uint8_t photoPin)
   avg = total / count;
 
   int value = avg; // analogRead(photoPin);
-  /*
-  Serial.print("PhotoValue: ");
-  Serial.print(value);
-  Serial.print(" (");
-  Serial.print(avg);
-  Serial.print(") ");
-  */
+
   psensor_max = max(value, psensor_max);
   psensor_min = min(value, psensor_min);
   int diff = psensor_max - psensor_min;
-  /*
-  Serial.print(psensor_max);
-  Serial.print(" ");
-  Serial.print(psensor_min);
-  Serial.print(" ");
-  */
+
 
   // Threshold is half the diff of max and min
   int threshold = diff / 2;

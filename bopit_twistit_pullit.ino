@@ -2,12 +2,12 @@
 #include "twist_it.h"
 #include "bop_it.h"
 #include "melody.h"
-// Actions section
 
+// Actions section
 byte rRGB = 2;
 byte gRGB = 9;
 byte bRGB = 11;
-String chosenMode = "Blue";
+String chosenMode = "classic";
 
 
 byte bopLed = 12;
@@ -59,29 +59,35 @@ void setup() {
   }
   Serial.begin(9600);
   randomSeed(analogRead(0));
+  // Sets RGB to classic as the default game mode is classic
   setRGB(0,0,255);
+  // Runs the set up of the game
   start();
   multiplayer_init();
 }
 
 void loop() {
 
-  if (chosenMode == "Blue") {
+  // Checks for which game was chosen
+  if (chosenMode == "classic") {
     classicMode();
-  } else if (chosenMode == "Green") {
+  } else if (chosenMode == "multiplayer") {
     multiplayerMode();
   }
 
+  // Lowers the interval depending on if the game action was successful
  lower_interval(success);
 }
 
 void failure()
 {
   success = false;
+  // Emits a tone if the game action was failed
   tone(buzzer,350);
   delay(200);
   tone(buzzer,200, 500);
-  if (chosenMode == "Blue"){
+  // Runs the classic set up for blinking the lights
+  if (chosenMode == "classic"){
   for (int i = 0; i < 6; i++) {
     digitalWrite(ledHealthPins[ledIndex], HIGH);
     delay(250);
@@ -99,7 +105,8 @@ void failure()
     ledIndex = 0;
   }
   play_melody(interval, true);
-  } else if(chosenMode == "Green") {
+  // Runs the multiplayer mode for blinking the light
+  } else if(chosenMode == "multiplayer") {
 
       for (int i = 0; i < 6; i++) {
     digitalWrite(ledHealthPins[2], HIGH);
@@ -123,46 +130,39 @@ void start()
 
   int blinkCount = 4;
   int delayTime = 200;
-  // Loopa blinkCount gånger
-  if (chosenMode == "Blue") {
+  // Loops through the amount of blinkCount
+  if (chosenMode == "classic") {
   for (int i = 0; i < blinkCount; i++) {
-    // Tänd lysdioderna
     digitalWrite(bopLed, HIGH);
     digitalWrite(twistLed, HIGH);
     digitalWrite(coverLed, HIGH);
     for (int k = 0; k < ledCount; k++) {
       digitalWrite(ledHealthPins[k], HIGH);
     };
-    // Fördröj i en kort stund
     delay(delayTime);
-    // Släck lysdioderna
     digitalWrite(bopLed, LOW);
     digitalWrite(twistLed, LOW);
     digitalWrite(coverLed, LOW);
     for (int j = 0; j < ledCount; j++) {
       digitalWrite(ledHealthPins[j], LOW);
     };
-    // Fördröj igen innan nästa blinkning
     delay(delayTime);
   }
   for (int k = 0; k < ledCount; k++) {
     digitalWrite(ledHealthPins[k], HIGH);
   }
-  } else if(chosenMode == "Green") {
+  // Only flash one light in multiplayer mode
+  } else if(chosenMode == "multiplayer") {
       for (int i = 0; i < blinkCount; i++) {
-    // Tänd lysdioderna
     digitalWrite(bopLed, HIGH);
     digitalWrite(twistLed, HIGH);
     digitalWrite(coverLed, HIGH);
     digitalWrite(ledHealthPins[2], HIGH);
-    // Fördröj i en kort stund
     delay(delayTime);
-    // Släck lysdioderna
     digitalWrite(bopLed, LOW);
     digitalWrite(twistLed, LOW);
     digitalWrite(coverLed, LOW);
     digitalWrite(ledHealthPins[2], LOW);
-    // Fördröj igen innan nästa blinkning
     delay(delayTime);
   }
   digitalWrite(ledHealthPins[2], HIGH);
@@ -170,6 +170,7 @@ void start()
 }
 
 void lower_interval(bool success) {
+  // Lowers the interval between action and music if the action was successful and above 1000ms
   if (interval > 1000 && success) {
     interval -= 100;
     
@@ -196,62 +197,48 @@ void setGameMode() {
   byte btnRead = digitalRead(bopBtn);
 
   if ((btnRead == HIGH) && toggle) {
+    // Sets game mode to multiplayer
     setRGB(0,255,0);
-    Serial.println("Green");
-    chosenMode = "Green";
+    chosenMode = "multiplayer";
     toggle = false;
+
   } else if((btnRead == HIGH) && !toggle) {
+    // Sets game mode to classic
     setRGB(0,0,255);
-    Serial.println("Blue");
-    chosenMode = "Blue";
+    chosenMode = "classic";
     toggle = true;
+    
     }
   }
-
 }
 
 void classicMode() {
-  switch(random(3)) {
-  case cover:
-    Serial.println("Cover it");
-    if (cover_it(coverLed, photoPin, interval) == true) {
-      Serial.println("Cover it succeeded.");
-      success = true;
-    } else {
-      failure();
-      Serial.println("Cover it failed");
-    }
-    break;
-  case bop:
-    Serial.println("Bop it");
-    if (bop_it(bopLed, bopBtn, interval) == true) {
-      Serial.println("Bop it succeeded.");
-      success = true;
-    } else {
-      failure();
-      Serial.println("Bop it failed");
-    }
-    break;
-  case twist:
-    Serial.println("Twist it");
-    if (twist_it(twistLed, twistPin, interval) == true) {
-      Serial.println("Twist it succeeded.");
-      success = true;
-    } else {
-      failure();
-      Serial.println("Twist it failed");
-    }
-    break;
-  default:
-    Serial.println("Something went wrong in the sequence instructions statement");
-    break;
+  // Runs vanilla game loop
+  gameLoop(random(3));
+}
+
+void multiplayerMode() {
+  // Declare and initalize variables used for multiplayer purpose
+  byte maxLevel = 30;
+  byte currentLevel = 0;
+  bool win = false;
+
+  // Runs vanilla game loop
+  gameLoop(random(3));
+
+  // Increases level counter and checks if level 30 has been reached
+  if (success) {
+    currentLevel++;
+  } else if(currentLevel == maxLevel) {
+    win = true;
   }
  
 }
 
-void multiplayerMode() {
-
-  switch(random(3)) {
+void gameLoop(byte randomNum) {
+  // The switch case calls every game action and makes a check on the return value
+  // if it does not return true it counts as a failed action and the failure method is called
+  switch(randomNum) {
   case cover:
     Serial.println("Cover it");
     if (cover_it(coverLed, photoPin, interval) == true) {
@@ -286,5 +273,4 @@ void multiplayerMode() {
     Serial.println("Something went wrong in the sequence instructions statement");
     break;
   }
- 
 }
