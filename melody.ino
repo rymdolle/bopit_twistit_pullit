@@ -14,7 +14,6 @@ bool play_melody(long interval, bool restart)
   if (millis() - start > interval) {
     // interval has passed, play next note
     const int length = sizeof(melody) / sizeof(melody[0]);
-    Serial.print(note);
     tone(buzzer, melody[note % length], interval / length);
     ++note;
     start = millis();
