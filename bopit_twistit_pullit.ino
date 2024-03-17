@@ -70,9 +70,10 @@ void setup() {
   // Sets RGB to classic as the default game mode is classic
   setRGB(0,0,255);
   // Runs the set up of the game
+  setGameMode();
+  if (chosenMode == "multiplayer")
+    multiplayer_init();
   start();
-  if (multiplayer_init())
-    chosenMode = "multiplayer";
 
   // Read sensor to set ambient light
   read_photosensor(photoPin);
@@ -140,8 +141,6 @@ void failure()
 
 void start()
 {
-  setGameMode();
-
   int blinkCount = 4;
   int delayTime = 200;
   // Loops through the amount of blinkCount

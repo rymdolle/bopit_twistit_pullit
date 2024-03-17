@@ -14,6 +14,7 @@ bool multiplayer_init()
   long start = millis();
   Wire.onReceive(multiplayer_onReceive);
   while (millis() - start < timeout) {
+    led_loading(500);
     if (multiplayerSetupSuccess) {
       Serial.print("Multiplayer started as SLAVE address ");
       Serial.println(slave_address);
@@ -29,6 +30,7 @@ bool multiplayer_init()
   Wire.begin();
   Wire.onReceive(multiplayer_onReceive);
   while (millis() - start < timeout) {
+    led_loading(500);
     Wire.beginTransmission(slave_address);
     Wire.write(slave_address);
     Wire.endTransmission();
@@ -41,7 +43,6 @@ bool multiplayer_init()
       Serial.println(slave_address);
       return true;
     }
-    delay(100);
   }
 
   Serial.println("Multiplayer is not set up");
@@ -63,5 +64,19 @@ void multiplayer_onReceive(int bytes) {
     Serial.print("Command: ");
     Serial.println(cmd);
     multiplayerSetupSuccess = true;
+  }
+}
+
+void led_loading(long timeout)
+{
+  static byte index = 0;
+  static long start = millis();
+  for (int i = 0; i < ledCount; ++i) {
+    digitalWrite(ledHealthPins[i], 0);
+  }
+  digitalWrite(ledHealthPins[index % ledCount], 1);
+  if (millis() - start > timeout) {
+    start = millis();
+    index++;
   }
 }
