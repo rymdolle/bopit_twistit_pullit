@@ -45,5 +45,5 @@ static bool read_photosensor(uint8_t photoPin)
 
   // Threshold is half the diff of max and min
   int threshold = diff / 2;
-  return (diff - (value - psensor_min)) > threshold;
+  return (value - psensor_min) > threshold;
 }
