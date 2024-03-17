@@ -76,7 +76,7 @@ void loop() {
   }
 
   // Lowers the interval depending on if the game action was successful
- lower_interval(success);
+  lower_interval(success);
 }
 
 void failure()
@@ -88,39 +88,39 @@ void failure()
   tone(buzzer,200, 500);
   // Runs the classic set up for blinking the lights
   if (chosenMode == "classic"){
-  for (int i = 0; i < 6; i++) {
-    digitalWrite(ledHealthPins[ledIndex], HIGH);
-    delay(250);
-    digitalWrite(ledHealthPins[ledIndex], LOW);
-    delay(250);
-  }
-  delay(1000);
-  ledIndex++;
-  if (ledIndex >= ledCount) {
-    interval = 4000;
-
-    for (int i = 0; i < ledCount; i++) {
-      digitalWrite(ledHealthPins[i],HIGH);
+    for (int i = 0; i < 6; i++) {
+      digitalWrite(ledHealthPins[ledIndex], HIGH);
+      delay(250);
+      digitalWrite(ledHealthPins[ledIndex], LOW);
+      delay(250);
     }
-    ledIndex = 0;
-  }
-  play_melody(interval, true);
-  // Runs the multiplayer mode for blinking the light
+    delay(1000);
+    ledIndex++;
+    if (ledIndex >= ledCount) {
+      interval = 4000;
+
+      for (int i = 0; i < ledCount; i++) {
+        digitalWrite(ledHealthPins[i],HIGH);
+      }
+      ledIndex = 0;
+    }
+    play_melody(interval, true);
+    // Runs the multiplayer mode for blinking the light
   } else if(chosenMode == "multiplayer") {
 
-      for (int i = 0; i < 6; i++) {
-    digitalWrite(ledHealthPins[2], HIGH);
-    delay(250);
-    digitalWrite(ledHealthPins[2], LOW);
-    delay(250);
-  }
-  delay(1000);
-  if (digitalRead(ledHealthPins[2]) == LOW) {
-    interval = 4000;
-    digitalWrite(ledHealthPins[2],HIGH);
-    gameOver = true;
-  }
-  play_melody(interval, true);
+    for (int i = 0; i < 6; i++) {
+      digitalWrite(ledHealthPins[2], HIGH);
+      delay(250);
+      digitalWrite(ledHealthPins[2], LOW);
+      delay(250);
+    }
+    delay(1000);
+    if (digitalRead(ledHealthPins[2]) == LOW) {
+      interval = 4000;
+      digitalWrite(ledHealthPins[2],HIGH);
+      gameOver = true;
+    }
+    play_melody(interval, true);
   }
 }
 
@@ -132,48 +132,49 @@ void start()
   int delayTime = 200;
   // Loops through the amount of blinkCount
   if (chosenMode == "classic") {
-  for (int i = 0; i < blinkCount; i++) {
-    digitalWrite(bopLed, HIGH);
-    digitalWrite(twistLed, HIGH);
-    digitalWrite(coverLed, HIGH);
+    for (int i = 0; i < blinkCount; i++) {
+      digitalWrite(bopLed, HIGH);
+      digitalWrite(twistLed, HIGH);
+      digitalWrite(coverLed, HIGH);
+      for (int k = 0; k < ledCount; k++) {
+        digitalWrite(ledHealthPins[k], HIGH);
+      };
+      delay(delayTime);
+      digitalWrite(bopLed, LOW);
+      digitalWrite(twistLed, LOW);
+      digitalWrite(coverLed, LOW);
+      for (int j = 0; j < ledCount; j++) {
+        digitalWrite(ledHealthPins[j], LOW);
+      };
+      delay(delayTime);
+    }
     for (int k = 0; k < ledCount; k++) {
       digitalWrite(ledHealthPins[k], HIGH);
-    };
-    delay(delayTime);
-    digitalWrite(bopLed, LOW);
-    digitalWrite(twistLed, LOW);
-    digitalWrite(coverLed, LOW);
-    for (int j = 0; j < ledCount; j++) {
-      digitalWrite(ledHealthPins[j], LOW);
-    };
-    delay(delayTime);
-  }
-  for (int k = 0; k < ledCount; k++) {
-    digitalWrite(ledHealthPins[k], HIGH);
-  }
-  // Only flash one light in multiplayer mode
+    }
+    // Only flash one light in multiplayer mode
   } else if(chosenMode == "multiplayer") {
-      for (int i = 0; i < blinkCount; i++) {
-    digitalWrite(bopLed, HIGH);
-    digitalWrite(twistLed, HIGH);
-    digitalWrite(coverLed, HIGH);
+    for (int i = 0; i < blinkCount; i++) {
+      digitalWrite(bopLed, HIGH);
+      digitalWrite(twistLed, HIGH);
+      digitalWrite(coverLed, HIGH);
+      digitalWrite(ledHealthPins[2], HIGH);
+      delay(delayTime);
+      digitalWrite(bopLed, LOW);
+      digitalWrite(twistLed, LOW);
+      digitalWrite(coverLed, LOW);
+      digitalWrite(ledHealthPins[2], LOW);
+      delay(delayTime);
+    }
     digitalWrite(ledHealthPins[2], HIGH);
-    delay(delayTime);
-    digitalWrite(bopLed, LOW);
-    digitalWrite(twistLed, LOW);
-    digitalWrite(coverLed, LOW);
-    digitalWrite(ledHealthPins[2], LOW);
-    delay(delayTime);
-  }
-  digitalWrite(ledHealthPins[2], HIGH);
   }
 }
 
 void lower_interval(bool success) {
-  // Lowers the interval between action and music if the action was successful and above 1000ms
+  // Lowers the interval between action and music if the action was
+  // successful and above 1000ms
   if (interval > 1000 && success) {
     interval -= 100;
-    
+
     Serial.print("Interval is: ");
     Serial.println(interval);
   } else {
@@ -194,20 +195,19 @@ void setGameMode() {
   int start = millis();
 
   while (millis() - start < timeout){
-  byte btnRead = digitalRead(bopBtn);
+    byte btnRead = digitalRead(bopBtn);
 
-  if ((btnRead == HIGH) && toggle) {
-    // Sets game mode to multiplayer
-    setRGB(0,255,0);
-    chosenMode = "multiplayer";
-    toggle = false;
+    if ((btnRead == HIGH) && toggle) {
+      // Sets game mode to multiplayer
+      setRGB(0,255,0);
+      chosenMode = "multiplayer";
+      toggle = false;
 
-  } else if((btnRead == HIGH) && !toggle) {
-    // Sets game mode to classic
-    setRGB(0,0,255);
-    chosenMode = "classic";
-    toggle = true;
-    
+    } else if((btnRead == HIGH) && !toggle) {
+      // Sets game mode to classic
+      setRGB(0,0,255);
+      chosenMode = "classic";
+      toggle = true;
     }
   }
 }
@@ -232,12 +232,12 @@ void multiplayerMode() {
   } else if(currentLevel == maxLevel) {
     win = true;
   }
- 
 }
 
 void gameLoop(byte randomNum) {
-  // The switch case calls every game action and makes a check on the return value
-  // if it does not return true it counts as a failed action and the failure method is called
+  // The switch case calls every game action and makes a check on the
+  // return value if it does not return true it counts as a failed
+  // action and the failure method is called
   switch(randomNum) {
   case cover:
     Serial.println("Cover it");
@@ -270,7 +270,6 @@ void gameLoop(byte randomNum) {
     }
     break;
   default:
-    Serial.println("Something went wrong in the sequence instructions statement");
     break;
   }
 }
