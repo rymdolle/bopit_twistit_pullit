@@ -1,8 +1,6 @@
 #include "cover_it.h"
 #include "melody.h"
 
-bool read_photosensor(uint8_t photoPin);
-
 bool cover_it(uint8_t coverLed, uint8_t photoPin, long timeout)
 {
   digitalWrite(coverLed, 1);

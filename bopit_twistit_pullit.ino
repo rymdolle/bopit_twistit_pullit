@@ -29,6 +29,7 @@ const int ledCount = sizeof(ledHealthPins) / sizeof(ledHealthPins[0]);
 unsigned long interval = 4000;
 bool gameOver = false;
 bool success = false;
+bool disableBuzzer = false;
 
 
 enum seqInstructions{
@@ -59,11 +60,22 @@ void setup() {
   }
   Serial.begin(9600);
   randomSeed(analogRead(0));
+
+  // Check if button is held down and disable buzzer
+  digitalWrite(bopLed, 1);
+  if (digitalRead(bopBtn))
+    disableBuzzer = true;
+  digitalWrite(bopLed, 0);
+
   // Sets RGB to classic as the default game mode is classic
   setRGB(0,0,255);
   // Runs the set up of the game
   start();
-  multiplayer_init();
+  if (multiplayer_init())
+    chosenMode = "multiplayer";
+
+  // Read sensor to set ambient light
+  read_photosensor(photoPin);
 }
 
 void loop() {
@@ -83,9 +95,11 @@ void failure()
 {
   success = false;
   // Emits a tone if the game action was failed
-  tone(buzzer,350);
-  delay(200);
-  tone(buzzer,200, 500);
+  if (!disableBuzzer) {
+    tone(buzzer,350);
+    delay(200);
+    tone(buzzer,200, 500);
+  }
   // Runs the classic set up for blinking the lights
   if (chosenMode == "classic"){
     for (int i = 0; i < 6; i++) {
