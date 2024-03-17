@@ -1,7 +1,6 @@
 #include "cover_it.h"
 #include "melody.h"
 
-bool read_photosensor(uint8_t photoPin);
 
 bool cover_it(uint8_t coverLed, uint8_t photoPin, long timeout)
 {
@@ -22,7 +21,7 @@ bool cover_it(uint8_t coverLed, uint8_t photoPin, long timeout)
   return false;
 }
 
-static bool read_photosensor(uint8_t photoPin)
+bool read_photosensor(uint8_t pin)
 {
   const int count = 10;
   int readings[count];
@@ -32,15 +31,15 @@ static bool read_photosensor(uint8_t photoPin)
   static int psensor_min = 1 << 14 - 1;
   static int psensor_max = 0;
 
-  analogRead(photoPin); // stabilise sensor reading
+  analogRead(pin); // stabilise sensor reading
   for (int i = 0; i < count; ++i) {
-    readings[i] = analogRead(photoPin); // take average reading
+    readings[i] = analogRead(pin); // take average reading
     total += readings[i];
   }
 
   avg = total / count;
 
-  int value = avg; // analogRead(photoPin);
+  int value = avg; // analogRead(pin);
   psensor_max = max(value, psensor_max);
   psensor_min = min(value, psensor_min);
   int diff = psensor_max - psensor_min;

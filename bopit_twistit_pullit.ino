@@ -63,7 +63,9 @@ void setup() {
   setRGB(0,0,255);
   // Runs the set up of the game
   start();
-  multiplayer_init();
+  if (multiplayer_init(1000))
+    chosenMode = "multiplayer";
+  read_photosensor(photoPin);
 }
 
 void loop() {
