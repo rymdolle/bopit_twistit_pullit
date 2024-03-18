@@ -29,19 +29,4 @@ static bool read_photosensor(uint8_t photoPin)
   }
   else {
     return false;
-  }
-<<<<<<< HEAD
-=======
-
-  avg = total / count;
-
-  int value = avg; // analogRead(photoPin);
-  psensor_max = max(value, psensor_max);
-  psensor_min = min(value, psensor_min);
-  int diff = psensor_max - psensor_min;
-
-  // Threshold is half the diff of max and min
-  int threshold = diff / 2;
-  return (value - psensor_min) > threshold;
->>>>>>> 2a6884512fff6991e020b733273f5e85e11c387d
 }
