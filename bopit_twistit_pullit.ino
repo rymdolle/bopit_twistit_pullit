@@ -206,6 +206,7 @@ void setGameMode() {
   int start = millis();
   int lastBtnRead = LOW;
 
+  digitalWrite(bopLed, HIGH); // workaround for prototype board
   while (millis() - start < timeout){
     int currBtnRead = digitalRead(bopBtn);
 
@@ -224,6 +225,7 @@ void setGameMode() {
         }
     lastBtnRead = currBtnRead;
   }
+  digitalWrite(bopLed, LOW); // workaround for prototype board
 }
 
 void classicMode() {
