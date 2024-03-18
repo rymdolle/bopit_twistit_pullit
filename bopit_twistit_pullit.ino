@@ -203,27 +203,27 @@ void setRGB(byte r, byte g, byte b) {
 void setGameMode() {
   bool toggle = true;
   int timeout = 4000;
-  unsigned start = millis();
+  int start = millis();
+  int lastBtnRead = LOW;
 
-  digitalWrite(bopLed, 1);
   while (millis() - start < timeout){
-    byte btnRead = digitalRead(bopBtn);
+    int currBtnRead = digitalRead(bopBtn);
 
-    if ((btnRead == HIGH) && toggle) {
-      // Sets game mode to multiplayer
-      setRGB(0, 255, 0);
-      chosenMode = "multiplayer";
-      toggle = false;
+      if (currBtnRead != lastBtnRead && currBtnRead == HIGH) {
+        toggle = !toggle;
 
-    } else if ((btnRead == HIGH) && !toggle) {
-      // Sets game mode to classic
-      setRGB(0, 0, 255);
-      chosenMode = "classic";
-      toggle = true;
-    }
+          if (toggle) {
+            // Sets game mode to multiplayer
+            setRGB(0,255,0);
+            chosenMode = "multiplayer";
+          } else {
+            // Sets game mode to classic
+            setRGB(0,0,255);
+            chosenMode = "classic";
+          }
+        }
+    lastBtnRead = currBtnRead;
   }
-
-  digitalWrite(bopLed, 0);
 }
 
 void classicMode() {
