@@ -164,6 +164,9 @@ void start() {
     }
     // Only flash one light in multiplayer mode
   } else if (chosenMode == "multiplayer") {
+    for (int i = 0; i < ledCount; i++) {
+      digitalWrite(ledHealthPins[i], LOW);
+    }
     for (int i = 0; i < blinkCount; i++) {
       digitalWrite(bopLed, HIGH);
       digitalWrite(twistLed, HIGH);
