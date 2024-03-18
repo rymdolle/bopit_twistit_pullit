@@ -29,4 +29,5 @@ static bool read_photosensor(uint8_t photoPin)
   }
   else {
     return false;
+  }
 }
