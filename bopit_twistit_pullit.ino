@@ -205,7 +205,8 @@ void setGameMode() {
   int timeout = 4000;
   unsigned start = millis();
 
-  while (millis() - start < timeout) {
+  digitalWrite(bopLed, 1);
+  while (millis() - start < timeout){
     byte btnRead = digitalRead(bopBtn);
 
     if ((btnRead == HIGH) && toggle) {
@@ -221,6 +222,8 @@ void setGameMode() {
       toggle = true;
     }
   }
+
+  digitalWrite(bopLed, 0);
 }
 
 void classicMode() {

@@ -3,7 +3,7 @@
 
 bool play_melody(long interval, bool restart) {
   if (disableBuzzer)
-    return;
+    return false;
   static uint8_t note = 0;
   static unsigned long start = millis();
   if (restart) {
