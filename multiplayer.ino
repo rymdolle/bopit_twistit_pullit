@@ -1,7 +1,7 @@
 #include <Wire.h>
 
 bool isMaster = false;
-byte slave_address = 0x20;
+int slave_address = 0x20;
 bool multiplayerSetupSuccess = false;
 
 // Return value is true if multiplayer mode is active
