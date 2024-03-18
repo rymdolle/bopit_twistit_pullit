@@ -5,13 +5,12 @@ int slave_address = 0x20;
 bool multiplayerSetupSuccess = false;
 
 // Return value is true if multiplayer mode is active
-bool multiplayer_init()
-{
+bool multiplayer_init() {
   Serial.println("Init multiplayer");
   // Set I2C to slave address to look for others
   Wire.begin(slave_address);
   long timeout = 4000;
-  long start = millis();
+  unsigned long start = millis();
   Wire.onReceive(multiplayer_onReceive);
   while (millis() - start < timeout) {
     led_loading(500);
@@ -67,8 +66,7 @@ void multiplayer_onReceive(int bytes) {
   }
 }
 
-void led_loading(long timeout)
-{
+void led_loading(long timeout) {
   static byte index = 0;
   static long start = millis();
   for (int i = 0; i < ledCount; ++i) {

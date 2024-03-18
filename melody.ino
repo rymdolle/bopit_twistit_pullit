@@ -1,12 +1,11 @@
 #include "melody.h"
 #include <stdint.h>
 
-bool play_melody(long interval, bool restart)
-{
+bool play_melody(long interval, bool restart) {
   if (disableBuzzer)
     return;
   static uint8_t note = 0;
-  static long start = millis();
+  static unsigned long start = millis();
   if (restart) {
     note = 0;
     start = millis();
@@ -19,7 +18,7 @@ bool play_melody(long interval, bool restart)
     tone(buzzer, melody[note % length], interval / length);
     ++note;
     start = millis();
-    if (note % length == 0) // melody wrapped around
+    if (note % length == 0)  // melody wrapped around
       return true;
   }
   return false;

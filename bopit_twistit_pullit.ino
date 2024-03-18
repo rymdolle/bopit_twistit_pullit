@@ -22,7 +22,7 @@ const int maxThreshold = 500;
 const int minThreshold = 300;
 bool twistSuccess = false;
 
-const int ledHealthPins[] = {6, 7, 8};
+const int ledHealthPins[] = { 6, 7, 8 };
 static int ledIndex = 0;
 const int ledCount = sizeof(ledHealthPins) / sizeof(ledHealthPins[0]);
 
@@ -32,7 +32,7 @@ bool success = false;
 bool disableBuzzer = false;
 
 
-enum seqInstructions{
+enum seqInstructions {
   cover,
   bop,
   twist
@@ -68,7 +68,7 @@ void setup() {
   digitalWrite(bopLed, 0);
 
   // Sets RGB to classic as the default game mode is classic
-  setRGB(0,0,255);
+  setRGB(0, 0, 255);
   // Runs the set up of the game
   setGameMode();
   if (chosenMode == "multiplayer")
@@ -92,17 +92,16 @@ void loop() {
   lower_interval(success);
 }
 
-void failure()
-{
+void failure() {
   success = false;
   // Emits a tone if the game action was failed
   if (!disableBuzzer) {
-    tone(buzzer,350);
+    tone(buzzer, 350);
     delay(200);
-    tone(buzzer,200, 500);
+    tone(buzzer, 200, 500);
   }
   // Runs the classic set up for blinking the lights
-  if (chosenMode == "classic"){
+  if (chosenMode == "classic") {
     for (int i = 0; i < 6; i++) {
       digitalWrite(ledHealthPins[ledIndex], HIGH);
       delay(250);
@@ -115,13 +114,13 @@ void failure()
       interval = 4000;
 
       for (int i = 0; i < ledCount; i++) {
-        digitalWrite(ledHealthPins[i],HIGH);
+        digitalWrite(ledHealthPins[i], HIGH);
       }
       ledIndex = 0;
     }
     play_melody(interval, true);
     // Runs the multiplayer mode for blinking the light
-  } else if(chosenMode == "multiplayer") {
+  } else if (chosenMode == "multiplayer") {
 
     for (int i = 0; i < 6; i++) {
       digitalWrite(ledHealthPins[2], HIGH);
@@ -132,15 +131,14 @@ void failure()
     delay(1000);
     if (digitalRead(ledHealthPins[2]) == LOW) {
       interval = 4000;
-      digitalWrite(ledHealthPins[2],HIGH);
+      digitalWrite(ledHealthPins[2], HIGH);
       gameOver = true;
     }
     play_melody(interval, true);
   }
 }
 
-void start()
-{
+void start() {
   int blinkCount = 4;
   int delayTime = 200;
   // Loops through the amount of blinkCount
@@ -165,10 +163,7 @@ void start()
       digitalWrite(ledHealthPins[k], HIGH);
     }
     // Only flash one light in multiplayer mode
-  } else if(chosenMode == "multiplayer") {
-    for (int i = 0; i < ledCount; i++) {
-      digitalWrite(ledHealthPins[i], LOW);
-    }
+  } else if (chosenMode == "multiplayer") {
     for (int i = 0; i < blinkCount; i++) {
       digitalWrite(bopLed, HIGH);
       digitalWrite(twistLed, HIGH);
@@ -208,20 +203,20 @@ void setRGB(byte r, byte g, byte b) {
 void setGameMode() {
   bool toggle = true;
   int timeout = 4000;
-  int start = millis();
+  unsigned start = millis();
 
-  while (millis() - start < timeout){
+  while (millis() - start < timeout) {
     byte btnRead = digitalRead(bopBtn);
 
     if ((btnRead == HIGH) && toggle) {
       // Sets game mode to multiplayer
-      setRGB(0,255,0);
+      setRGB(0, 255, 0);
       chosenMode = "multiplayer";
       toggle = false;
 
-    } else if((btnRead == HIGH) && !toggle) {
+    } else if ((btnRead == HIGH) && !toggle) {
       // Sets game mode to classic
-      setRGB(0,0,255);
+      setRGB(0, 0, 255);
       chosenMode = "classic";
       toggle = true;
     }
@@ -245,7 +240,7 @@ void multiplayerMode() {
   // Increases level counter and checks if level 30 has been reached
   if (success) {
     currentLevel++;
-  } else if(currentLevel == maxLevel) {
+  } else if (currentLevel == maxLevel) {
     win = true;
   }
 }
@@ -254,38 +249,38 @@ void gameLoop(byte randomNum) {
   // The switch case calls every game action and makes a check on the
   // return value if it does not return true it counts as a failed
   // action and the failure method is called
-  switch(randomNum) {
-  case cover:
-    Serial.println("Cover it");
-    if (cover_it(coverLed, photoPin, interval) == true) {
-      Serial.println("Cover it succeeded.");
-      success = true;
-    } else {
-      failure();
-      Serial.println("Cover it failed");
-    }
-    break;
-  case bop:
-    Serial.println("Bop it");
-    if (bop_it(bopLed, bopBtn, interval) == true) {
-      Serial.println("Bop it succeeded.");
-      success = true;
-    } else {
-      failure();
-      Serial.println("Bop it failed");
-    }
-    break;
-  case twist:
-    Serial.println("Twist it");
-    if (twist_it(twistLed, twistPin, interval) == true) {
-      Serial.println("Twist it succeeded.");
-      success = true;
-    } else {
-      failure();
-      Serial.println("Twist it failed");
-    }
-    break;
-  default:
-    break;
+  switch (randomNum) {
+    case cover:
+      Serial.println("Cover it");
+      if (cover_it(coverLed, photoPin, interval) == true) {
+        Serial.println("Cover it succeeded.");
+        success = true;
+      } else {
+        failure();
+        Serial.println("Cover it failed");
+      }
+      break;
+    case bop:
+      Serial.println("Bop it");
+      if (bop_it(bopLed, bopBtn, interval) == true) {
+        Serial.println("Bop it succeeded.");
+        success = true;
+      } else {
+        failure();
+        Serial.println("Bop it failed");
+      }
+      break;
+    case twist:
+      Serial.println("Twist it");
+      if (twist_it(twistLed, twistPin, interval) == true) {
+        Serial.println("Twist it succeeded.");
+        success = true;
+      } else {
+        failure();
+        Serial.println("Twist it failed");
+      }
+      break;
+    default:
+      break;
   }
 }
